@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "worker-email-link"
+  labels:
+    app: "worker-email-link"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: "worker-email-link"
+  template:
+    metadata:
+      labels:
+        app: "worker-email-link"
+    spec:
+      containers:
+      - name: "worker-email-link"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Values.env }}"
+        command: ["/mnt/api/bin/bundle"]
+        args: ["exec", "sidekiq -t 2 -C /mnt/api/config/sidekiq_email_link_worker.yml"]
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name: "{{ .Release.Namespace }}-loanlink-api"   
+        env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: postgres
+                key: url
+          - name: EHYP_OAUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: ehyp
+                key: key                
+          - name: EMAIL_DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: postgresemail
+                key: url
+          - name: EUROPACE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: eurospace
+                key: key
+          - name: FILESTACK_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: filestackapi
+                key: key
+          - name: FILESTACK_APP_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: filestackapp
+                key: key
+          - name: MAILCHIMP_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: mailchimp
+                key: key
+          - name: MORTGAGE_UPDATE_HASH
+            valueFrom:
+              secretKeyRef:
+                name: mortgage
+                key: key
+          - name: NYLAS_APP_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: nylas-app-secret
+                key: secret
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgrespw
+                key: key                 
+          - name: RUBY_GC_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: ruby
+                key: key
+          - name: SECRET_KEY_BASE
+            valueFrom:
+              secretKeyRef:
+                name: secretkeybase
+                key: key
+          - name: SEGMENT_WRITE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: segment
+                key: key
+          - name: SENDGRID_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: sendgridapi
+                key: key
+          - name: SENDGRID_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sendgridpw
+                key: key
+          - name: SPRENGNETTER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sprengnetter
+                key: key
+          - name: SQREEN_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: sqreen
+                key: key
+          - name: TWILIO_AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: twilio
+                key: key

@@ -1,0 +1,20 @@
+image_name="loanlink-api"
+repo_name="$image_name"
+repo_url="finlinkcr.azurecr.io"
+envs=(
+develop
+develop-azure
+develop-falcon
+develop-powerplay
+develop-test
+develop-test3
+develop-tokyo
+develop-tokyo-2
+)
+for env in "${envs[@]}"
+do
+echo "changing tag of the image $image_name to $repo_url/$repo_name/$env:latest"
+docker tag $image_name $repo_url/$repo_name/$env:latest
+echo "pushing the image $repo_url/$repo_name/$env:latest"
+docker push $repo_url/$repo_name/$env:latest
+done

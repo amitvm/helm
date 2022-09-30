@@ -1,0 +1,39 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: finlink-{{ .Values.env }}-cert
+spec:
+  secretName: finlink-{{ .Values.env }}-cert
+  issuerRef:
+    name: letsencrypt-test
+    kind: ClusterIssuer
+  commonName: '*.{{ .Values.env }}.{{ .Values.domain }}'
+  dnsNames:
+  - '*.{{ .Values.env }}.{{ .Values.domain }}'
+---
+apiVersion: getambassador.io/v2
+kind: Host
+metadata:
+  name: {{ .Values.env }}-host
+spec:
+  ambassador_id: {{ .Values.ambassador_id }}
+  acmeProvider:
+    authority: none
+  hostname: '*.{{ .Values.env }}.{{ .Values.domain }}'
+  selector:
+    matchLabels:
+      hostname: {{ .Values.env }}-host
+  tlsSecret:
+    name: finlink-{{ .Values.env }}-cert
+---
+apiVersion: getambassador.io/v1
+kind: Mapping
+metadata:
+  name: {{ .Values.env }}-loanlink-api
+  namespace: default
+spec:
+  host: api.{{ .Values.env }}.{{ .Values.domain }}
+  prefix: /
+  precedence: 10
+  service: loanlink-api.{{ .Values.env }}-loanlink-api:{{ .Values.service.port }}
+  ambassador_id: {{ .Values.ambassador_id }}

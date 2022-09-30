@@ -1,0 +1,163 @@
+# Default values for loanlink-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/loanlink/loanlink-api
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets:
+  - name: dockerconfigjson-github-com 
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+      - path: /
+        backend:
+          serviceName: chart-example.local
+          servicePort: 80
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Default application environment variables:
+
+env: develop
+domain: finlink-k8s.com
+ambassador_id: emissary_public
+
+api_env:
+  ACTION_CABLE_ORIGINS: "https://admin.{{ .Values.env }}.{{ .Values.domain }}"
+  ACTION_CABLE_URL: "wss://finlink-api.{{ .Values.env }}.{{ .Values.domain }}/cable"
+  ADMIN_PASSWORD_RESET_URL: "https://admin.{{ .Values.env }}.{{ .Values.domain }}/set-password"
+  ADMIN_URL: "https://admin.{{ .Values.env }}.{{ .Values.domain }}/"
+  AIRTABLE_API_KEY: "keyQxGFkYAYjgfWv1"
+  AUTH_CONFIRM_SUCCESS_URL: "/login?emailConfirmed=true"
+  AUTH_PASSWORD_RESET_URL: "/set-password"
+  AUTH_REGISTRATION_URL: "/register"
+  CLIENT_APP_BASE_SUBDOMAIN: "loanlink"
+  CLIENT_APP_URL: "https://loanlink.{{ .Values.env }}.{{ .Values.domain }}"
+  DASHBOARD_URL: "/dashboard"
+  DEFAULT_SMS_EXPIRY_HOURS: "48"
+  EHYP_ENABLED: "true"
+  EUROPACE_ENABLED: "true"
+  EUROPACE_ENV: "TEST_MODUS"
+  FILESTACK_ENABLED: "true"
+  FORCE_SSL_OVERRIDE: "false"
+  INTERCEPT_STAGING_EMAILS: "true"
+  INTERCEPT_STAGING_PHONE_NO: "+4915237127293"
+  INTERCEPT_STAGING_SMS: "true"
+  INTERCEPT_STAGING_TO_EMAIL: "jhansi@finlink.de"
+  IS24_LEADS_URL: "https://rest.sandbox-immobilienscout24.de/restapi/api/"
+  IS24_OAUTH_CONSUMER_KEY: "Finlink - LoanLink GmbHKey"
+  IS24_OAUTH_CONSUMER_SECRET: "8S6eK4TrtZTuJEV8"
+  LANG: "en_US.UTF-8"
+  LOAN_CALCULATION_SERVICE_ACCESS_KEY: "schoenhauserallee"
+  LOAN_CALCULATION_SERVICE_URL: "https://loan-calculator-staging.herokuapp.com/"
+  MAILCHIMP_ENABLED: "false"
+  MALLOC_ARENA_MAX: "2"
+  NYLAS_APP_ID: "2wcdju2v1gkhdy9ud9y0t63gx"
+  NYLAS_ENABLED: "true"
+  PORT: "3000"
+  POSTGRES_HOST: "postgres.{{ .Values.env }}-loanlink-api"
+  POSTGRES_TEST_EMAILS_DB: "finlink-emails_test"
+  POSTGRES_TEST_DB: "finlink-api_test"
+  POSTGRES_USER: "postgres"
+  RACK_ENV: "staging"
+  RACK_TIMEOUT_SERVICE_PAST_WAIT: "false"
+  RACK_TIMEOUT_SERVICE_TIMEOUT: "15"
+  RACK_TIMEOUT_WAIT_OVERTIME: "60"
+  RAILS_ENV: "staging"
+  RAILS_LOG_TO_STDOUT: "enabled"
+  RAILS_SERVE_STATIC_FILES: "enabled"
+  REDIS_URL: "redis://redis-master.{{ .Values.env }}-loanlink-api/"
+  RUBY_GC_HEAP_FREE_SLOTS: "1215459"
+  RUBY_GC_HEAP_GROWTH_FACTOR: "1.03"
+  RUBY_GC_HEAP_GROWTH_MAX_SLOTS: "162061"
+  RUBY_GC_HEAP_INIT_SLOTS: "405153"
+  RUBY_GC_HEAP_OLDOBJECT_LIMIT_FACTOR: "1.2"
+  RUBY_GC_MALLOC_LIMIT: "33554432"
+  RUBY_GC_MALLOC_LIMIT_GROWTH_FACTOR: "1.32"
+  RUBY_GC_MALLOC_LIMIT_MAX: "60397978"
+  RUBY_GC_OLDMALLOC_LIMIT: "27318891"
+  RUBY_GC_OLDMALLOC_LIMIT_GROWTH_FACTOR: "1.2"
+  RUBY_GC_OLDMALLOC_LIMIT_MAX: "49174004"
+  SCOUT_LOG_LEVEL: "INFO"
+  SEGMENT_ENABLED: "false"
+  SENDGRID_DOMAIN: "loanlink.de"
+  SENDGRID_ENABLED: "true"
+  SENDGRID_USERNAME: "loanlink"
+  SHORTENER_URL_DOMAIN: "http://tok2.capaio.com"
+  SIDEKIQ_PASSWORD: "space-cadets"
+  SIDEKIQ_USERNAME: "sidekiq"
+  SKYLIGHT_ENABLED: "true"
+  SPRENGNETTER_ENABLED: "true"
+  TWILIO_ACCOUNT_SID: "AC214c6ab2fa2ec3c21e1fb4ae612e9d5d"
+  TWILIO_ENABLED: "true"
+  TWILIO_SENDER_ID: "FinLink"
+  TZ: "Berlin"
+  URL_HOST: "https://loanlink.{{ .Values.env }}.{{ .Values.domain }}"
